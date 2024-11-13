@@ -7,7 +7,7 @@ use std::str;
 #[command(version, about, long_about = None)]
 struct Args {
     /// file info
-    #[arg(short, long, default_value_t = false)]
+    #[arg(short, long, default_value_t = true)]
     status: bool,
 
     /// branch info
