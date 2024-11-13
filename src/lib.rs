@@ -73,9 +73,9 @@ pub fn duck_status() -> String {
 
 pub fn duck_branch() -> String {
     let mut out = String::new();
-    let cmdout = BaseCliCommands::CurrentBranch.run();
-    out.push_str(&cmdout.to_string());
     let cmdout = BaseCliCommands::RemoteBranch.run();
+    out.push_str(&cmdout.to_string());
+    let cmdout = BaseCliCommands::CurrentBranch.run();
     out.push_str(&cmdout.to_string());
 
     out.trim().to_string()
