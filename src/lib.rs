@@ -52,20 +52,26 @@ pub fn duck_status() -> String {
     }
 
     let mut out = String::new();
-    out.push_str("\nA \n");
-    for i in a {
-        out.push_str(i);
-        out.push_str("\n");
+    if !a.is_empty() {
+        out.push_str("\nA \n");
+        for i in a {
+            out.push_str(i);
+            out.push_str("\n");
+        }
     }
-    out.push_str("\nM \n");
-    for i in m {
-        out.push_str(i);
-        out.push_str("\n");
+    if !m.is_empty() {
+        out.push_str("\nM \n");
+        for i in m {
+            out.push_str(i);
+            out.push_str("\n");
+        }
     }
-    out.push_str("\nU \n");
-    for i in u {
-        out.push_str(i);
-        out.push_str("\n");
+    if !u.is_empty() {
+        out.push_str("\nU \n");
+        for i in u {
+            out.push_str(i);
+            out.push_str("\n");
+        }
     }
 
     out
