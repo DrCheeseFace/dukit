@@ -2,7 +2,7 @@ pub mod base_commands;
 pub mod duck_commands;
 use crate::base_commands::BaseCliCommands;
 
-use std::{ops::Index, process::Output};
+use std::process::Output;
 
 #[derive(Debug)]
 pub struct DisplayableCliCommand(Output);
@@ -16,12 +16,6 @@ impl std::fmt::Display for DisplayableCliCommand {
             return writeln!(f, "{}", stdout.trim());
         }
         return writeln!(f, "{}", stderr.trim());
-    }
-}
-
-pub fn tempprintout(printouts: Vec<String>) {
-    for i in printouts {
-        println!("{}", i)
     }
 }
 

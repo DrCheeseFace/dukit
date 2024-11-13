@@ -1,6 +1,5 @@
 use clap::Parser;
 use duk::duck_commands::DuckCommands;
-use duk::tempprintout;
 use std::str;
 
 /// git for ducks
@@ -18,15 +17,15 @@ struct Args {
 
 fn main() {
     let args = Args::parse();
-    let mut out: Vec<String> = Vec::new();
+    let mut out: String = String::new();
     if args.status {
-        out.push(DuckCommands::Status.run())
+        out = DuckCommands::Status.run()
     }
     if args.branch {
-        out.push(DuckCommands::Branch.run())
+        out = DuckCommands::Branch.run()
     }
 
-    tempprintout(out)
+    println!("{}", out)
 }
 
 #[cfg(test)]
