@@ -21,11 +21,12 @@ notice how easy copy pasting should be
 
 
 ## TODO
-- [x]  nice status info
-- [x] nice branch and remote info
+- [ ] testing NO CLUE 
+- [x] status info
+- [x] branch and remote info
 - [ ] git add using editor
 - [ ] git switch branch using editor
-- [ ] fzf branch switching
+- [ ] fuzzy branch switching?
 - [ ] nice git log info
 - [ ] ez copy commit hashes 
 
