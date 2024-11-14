@@ -47,7 +47,10 @@ notice how easy copy pasting should be
 - [ ] ez stash and poppin info 
 - [ ] nice git log info
 - [ ] ez copy commit hashes 
+- [ ] ez rebase
+- [ ] ez cherry pick 
 - [ ] random other git porcelein shizz 
+- [ ] unwrap unwrap unwrap unwrap unwrap unwrap 
 
 ![duck duck duck duck](duck.gif)
 
