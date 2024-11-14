@@ -11,6 +11,9 @@ git status command (default method) but copy pasteable
 ```sh
 > duk 
 
+  S
+  src/lib.rs
+
   M
   src/lib.rs
 
@@ -29,6 +32,10 @@ notice how easy copy pasting should be
 
 ```
 
+## Contributing
+- If you want to suggest a feature put in an issue with the feature request.
+- If you spot a bug (which there probabably are many), put in an issue with how to reproduce it. 
+- If you want to contribute code, make a pull request. anything short of a war crime will probably be accepted.
 
 ## TODO
 - [ ] testing NO CLUE 
@@ -37,14 +44,10 @@ notice how easy copy pasting should be
 - [ ] git add using editor
 - [ ] git switch branch using editor
 - [ ] fuzzy branch switching?
+- [ ] ez stash and poppin info 
 - [ ] nice git log info
 - [ ] ez copy commit hashes 
 - [ ] random other git porcelein shizz 
-
-## Contributing
-- If you want to suggest a feature put in an issue with the feature request.
-- If you spot a bug (which there probabably are many), put in an issue with how to reproduce it. 
-- If you want to contribute code, make a pull request. anything short of a war crime will probably be accepted.
 
 ![duck duck duck duck](duck.gif)
 
