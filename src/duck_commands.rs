@@ -6,7 +6,7 @@ pub enum DuckCommands {
 }
 
 impl DuckCommands {
-    pub fn run(&self) -> String {
+    pub fn run(&self) {
         match self {
             DuckCommands::Status => duck_status(),
             DuckCommands::Branch => duck_branch(),

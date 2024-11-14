@@ -17,15 +17,12 @@ struct Args {
 
 fn main() {
     let args = Args::parse();
-    let mut out: String = String::new();
-    if args.status {
-        out = DuckCommands::Status.run()
-    }
     if args.branch {
-        out = DuckCommands::Branch.run()
+        DuckCommands::Branch.run();
+    }else if args.status {
+       DuckCommands::Status.run();
     }
 
-    println!("{}", out)
 }
 
 #[cfg(test)]

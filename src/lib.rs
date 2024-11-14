@@ -1,3 +1,4 @@
+use termion::color;
 pub mod base_commands;
 pub mod duck_commands;
 use crate::base_commands::BaseCliCommands;
@@ -13,70 +14,77 @@ impl std::fmt::Display for DisplayableCliCommand {
         let stderr = String::from_utf8_lossy(&self.0.stderr);
 
         if stderr.is_empty() {
-            return writeln!(f, "{}", stdout.trim());
+            return writeln!(f, "{}", stdout);
         }
-        return writeln!(f, "{}", stderr.trim());
+        return writeln!(f, "{}", stderr);
     }
 }
 
-pub fn duck_status() -> String {
+pub fn duck_status() {
     let out = BaseCliCommands::Status.run();
     let binding = out.to_string();
     let mut v: Vec<&str> = binding.split('\n').collect();
+
+    // find a better way
+    v.pop();
     v.pop();
 
     let mut a: Vec<&str> = Vec::new();
     let mut m: Vec<&str> = Vec::new();
     let mut u: Vec<&str> = Vec::new();
+    let mut d: Vec<&str> = Vec::new();
 
-    for lines in v {
-        let split: Vec<&str> = lines.split_whitespace().collect();
-        let file = *split.get(1).unwrap();
-        let state = *split.get(0).unwrap();
+    for line in v {
+        let split: (&str, &str) = line.split_at(2);
+        let file = split.1;
+        let state = split.0;
 
-        if state.contains('A') {
+        if state.chars().nth(0).unwrap() != ' ' && state.chars().nth(0).unwrap() != '?' {
             a.push(file)
         }
-        if state.contains('M') {
+        if state.chars().nth(1).unwrap() == 'M' {
             m.push(file)
         }
-        if state.contains('?') {
+        if state.chars().nth(1).unwrap() == '?' {
             u.push(file)
+        }
+        if state.chars().nth(1).unwrap() == 'D' {
+            d.push(file)
         }
     }
 
-    let mut out = String::new();
     if !a.is_empty() {
-        out.push_str("\nA \n");
+        println!("{}\n S", color::Fg(color::Green));
         for i in a {
-            out.push_str(i);
-            out.push_str("\n");
+            println!("{}{}", color::Fg(color::LightGreen), i);
         }
     }
     if !m.is_empty() {
-        out.push_str("\nM \n");
+        println!("{}\n M", color::Fg(color::Yellow));
         for i in m {
-            out.push_str(i);
-            out.push_str("\n");
+            println!("{}{}", color::Fg(color::LightYellow), i);
         }
     }
     if !u.is_empty() {
-        out.push_str("\nU \n");
+        println!("{}\n U", color::Fg(color::Red));
         for i in u {
-            out.push_str(i);
-            out.push_str("\n");
+            println!("{}{}", color::Fg(color::LightRed), i);
         }
     }
-
-    out
+    if !d.is_empty() {
+        println!("{}\n D", color::Fg(color::Red));
+        for i in d {
+            println!("{}{}", color::Fg(color::LightRed), i);
+        }
+    }
 }
 
-pub fn duck_branch() -> String {
+pub fn duck_branch() {
     let mut out = String::new();
     let cmdout = BaseCliCommands::RemoteBranch.run();
     out.push_str(&cmdout.to_string());
     let cmdout = BaseCliCommands::CurrentBranch.run();
     out.push_str(&cmdout.to_string());
 
-    out.trim().to_string()
+    println!("\n{}{}", color::Fg(color::LightRed), out.trim().to_string())
 }
