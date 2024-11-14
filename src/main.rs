@@ -13,16 +13,21 @@ struct Args {
     /// branch info
     #[arg(short, long, default_value_t = false)]
     branch: bool,
+
+    /// interactive add
+    #[arg(short, long, default_value_t = false)]
+    iadd: bool,
 }
 
 fn main() {
     let args = Args::parse();
     if args.branch {
         DuckCommands::Branch.run();
-    }else if args.status {
-       DuckCommands::Status.run();
+    } else if args.iadd {
+        DuckCommands::Add.run();
+    } else if args.status {
+        DuckCommands::Status.run();
     }
-
 }
 
 #[cfg(test)]

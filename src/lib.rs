@@ -21,9 +21,8 @@ impl std::fmt::Display for DisplayableCliCommand {
 }
 
 pub fn duck_status() {
-    let out = BaseCliCommands::Status.run();
-    let binding = out.to_string();
-    let mut v: Vec<&str> = binding.split('\n').collect();
+    let out = BaseCliCommands::Status.run(None);
+    let mut v: Vec<&str> = out.split('\n').collect();
 
     // find a better way
     v.pop();
@@ -81,10 +80,16 @@ pub fn duck_status() {
 
 pub fn duck_branch() {
     let mut out = String::new();
-    let cmdout = BaseCliCommands::RemoteBranch.run();
-    out.push_str(&cmdout.to_string());
-    let cmdout = BaseCliCommands::CurrentBranch.run();
+    let cmdout = BaseCliCommands::RemoteBranch.run(None);
+    out.push_str(&cmdout.to_string().trim());
+    out.push_str("\n");
+    let cmdout = BaseCliCommands::CurrentBranch.run(None);
     out.push_str(&cmdout.to_string());
 
-    println!("\n{}{}", color::Fg(color::LightRed), out.trim().to_string())
+    println!("\n{}{}", color::Fg(color::Magenta), out.trim().to_string())
+}
+
+pub fn duck_add() {
+    let cmdout = BaseCliCommands::OpenEditor.run(Some("is this working".to_string()));
+    println!("{}", cmdout);
 }
