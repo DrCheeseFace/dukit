@@ -1,10 +1,9 @@
+use crate::{get_editor, DisplayableCliCommand, TEMP_FILE_PATH};
 use std::{
     fs::{self, File},
     io::Write,
     process::Command,
 };
-
-use crate::DisplayableCliCommand;
 
 pub enum BaseCliCommands {
     Status,
@@ -15,15 +14,15 @@ pub enum BaseCliCommands {
 }
 
 impl BaseCliCommands {
-    pub fn get_cli_command(&self) -> &str {
+    fn get_cli_command(&self) -> String {
         match self {
-            BaseCliCommands::Status => "git status -s",
-            BaseCliCommands::CurrentBranch => "git branch --show-current",
+            BaseCliCommands::Status => "git status -s".to_string(),
+            BaseCliCommands::CurrentBranch => "git branch --show-current".to_string(),
             BaseCliCommands::RemoteBranch => {
-                "git status -uno | grep -E 'Your branch is (ahead|behind|up to date)'"
+                "git status -uno | grep -E 'Your branch is (ahead|behind|up to date)'".to_string()
             }
-            BaseCliCommands::OpenEditor => "\"${EDITOR:-vi}\"",
-            BaseCliCommands::Todo => "echo 'hi :3'",
+            BaseCliCommands::OpenEditor => get_editor(),
+            BaseCliCommands::Todo => "echo 'hi :3'".to_string(),
         }
     }
 
@@ -34,29 +33,25 @@ impl BaseCliCommands {
         }
     }
 
+    /// opens editor with given stdin to display to user
+    /// returns a string of the saved file on exit
     fn open_editor(self, stdin: String) -> String {
-        //TODO find better location
-        let file_path = "duk.txt";
-
-        let mut file = File::create(file_path).unwrap();
+        let mut file = File::create(TEMP_FILE_PATH).unwrap();
         file.write_all(stdin.as_bytes()).unwrap();
         drop(file);
 
-        let _ = Command::new("vim")
-            .arg(file_path)
+        Command::new(get_editor())
+            .arg(TEMP_FILE_PATH)
             .spawn()
-            .unwrap()
+            .expect("couldnt open temp file with editor")
             .wait()
-            .unwrap();
+            .expect("bad exit code from closing editor");
 
-        let modified_file = fs::read_to_string(file_path).unwrap();
-        println!("{:?}", modified_file);
-
-        fs::remove_file(file_path).unwrap();
-
-        modified_file
+        fs::read_to_string(TEMP_FILE_PATH).unwrap()
     }
 
+    /// runs a generic cli command
+    /// returns a string of the output
     fn run_generic(self) -> String {
         let output = Command::new("sh")
             .arg("-c")
