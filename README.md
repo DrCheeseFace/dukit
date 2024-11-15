@@ -39,6 +39,7 @@ notice how easy copy pasting should be
 
 ## TODO
 - [ ] testing NO CLUE 
+- [ ] what is up docs 
 - [x] status info
 - [x] branch and remote info
 - [ ] git add using editor

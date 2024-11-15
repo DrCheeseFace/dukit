@@ -9,15 +9,17 @@ pub enum DuckCommands {
 }
 
 impl DuckCommands {
+    /// DUCKS!
     pub fn run(&self) {
         match self {
-            DuckCommands::Status => self.duck_status(),
-            DuckCommands::Branch => self.duck_branch(),
-            DuckCommands::Add => self.duck_add(),
+            DuckCommands::Status => self.duck_file_status(),
+            DuckCommands::Branch => self.duck_current_branch(),
+            DuckCommands::Add => self.duck_interactive_add(),
         }
     }
 
-    fn duck_status(&self) {
+    /// pretty git status for files output
+    fn duck_file_status(&self) {
         let out = BaseCliCommands::Status.run(None);
         let mut v: Vec<&str> = out.split('\n').collect();
 
@@ -75,7 +77,8 @@ impl DuckCommands {
         }
     }
 
-    fn duck_branch(&self) {
+    /// pretty git status output for current branch info
+    fn duck_current_branch(&self) {
         let mut out = String::new();
         let cmdout = BaseCliCommands::RemoteBranch.run(None);
         out.push_str(&cmdout.to_string().trim());
@@ -86,7 +89,7 @@ impl DuckCommands {
         println!("\n{}{}", color::Fg(color::Magenta), out.trim().to_string())
     }
 
-    fn duck_add(&self) {
+    fn duck_interactive_add(&self) {
         let cmdout = BaseCliCommands::OpenEditor.run(Some("is this working".to_string()));
         println!("{}", cmdout);
     }

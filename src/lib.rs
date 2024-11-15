@@ -19,6 +19,8 @@ impl std::fmt::Display for DisplayableCliCommand {
     }
 }
 
+
+/// gets the default editor the system 
 fn get_editor() -> String {
     var("EDITOR").unwrap_or("vi".to_string())
 }

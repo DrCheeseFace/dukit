@@ -14,6 +14,15 @@ pub enum BaseCliCommands {
 }
 
 impl BaseCliCommands {
+    /// runs command and returns output as a string
+    pub fn run(self, stdin: Option<String>) -> String {
+        match self {
+            BaseCliCommands::OpenEditor => self.open_editor(stdin.unwrap_or_default()),
+            _ => self.run_generic_command(),
+        }
+    }
+
+    /// gets the cli command as a string
     fn get_cli_command(&self) -> String {
         match self {
             BaseCliCommands::Status => "git status -s".to_string(),
@@ -23,13 +32,6 @@ impl BaseCliCommands {
             }
             BaseCliCommands::OpenEditor => get_editor(),
             BaseCliCommands::Todo => "echo 'hi :3'".to_string(),
-        }
-    }
-
-    pub fn run(self, stdin: Option<String>) -> String {
-        match self {
-            BaseCliCommands::OpenEditor => self.open_editor(stdin.unwrap_or_default()),
-            _ => self.run_generic(),
         }
     }
 
@@ -52,7 +54,7 @@ impl BaseCliCommands {
 
     /// runs a generic cli command
     /// returns a string of the output
-    fn run_generic(self) -> String {
+    fn run_generic_command(self) -> String {
         let output = Command::new("sh")
             .arg("-c")
             .arg(self.get_cli_command())
