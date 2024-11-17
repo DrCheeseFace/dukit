@@ -22,7 +22,7 @@ struct Args {
 fn main() {
     let args = Args::parse();
     if args.branch {
-        DuckCommands::Branch.run();
+        let _ = DuckCommands::Branch.run();
     } else if args.iadd {
         DuckCommands::Add.run();
     } else if args.status {

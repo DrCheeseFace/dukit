@@ -1,5 +1,7 @@
-use crate::{get_editor, DisplayableCliCommand, TEMP_FILE_PATH};
+use crate::errors::DuckErrors;
+use crate::{DisplayableCliCommand, TEMP_FILE_PATH};
 use std::{
+    env::var,
     fs::{self, File},
     io::Write,
     process::Command,
@@ -10,14 +12,16 @@ pub enum BaseCliCommands {
     CurrentBranch,
     RemoteBranch,
     OpenEditor,
+    AddFile,
     Todo,
 }
 
 impl BaseCliCommands {
     /// runs command and returns output as a string
-    pub fn run(self, stdin: Option<String>) -> String {
+    pub fn run(self, stdin: Option<String>) -> Result<String, DuckErrors> {
         match self {
             BaseCliCommands::OpenEditor => self.open_editor(stdin.unwrap_or_default()),
+            BaseCliCommands::AddFile => self.add_file(stdin.unwrap_or_default()),
             _ => self.run_generic_command(),
         }
     }
@@ -30,37 +34,71 @@ impl BaseCliCommands {
             BaseCliCommands::RemoteBranch => {
                 "git status -uno | grep -E 'Your branch is (ahead|behind|up to date)'".to_string()
             }
-            BaseCliCommands::OpenEditor => get_editor(),
+            BaseCliCommands::OpenEditor => self.get_editor(),
+            BaseCliCommands::AddFile => "git add".to_string(),
             BaseCliCommands::Todo => "echo 'hi :3'".to_string(),
         }
     }
 
     /// opens editor with given stdin to display to user
     /// returns a string of the saved file on exit
-    fn open_editor(self, stdin: String) -> String {
+    fn open_editor(self, stdin: String) -> Result<String, DuckErrors> {
         let mut file = File::create(TEMP_FILE_PATH).unwrap();
         file.write_all(stdin.as_bytes()).unwrap();
         drop(file);
 
-        Command::new(get_editor())
+        Command::new(self.get_editor())
             .arg(TEMP_FILE_PATH)
             .spawn()
-            .expect("couldnt open temp file with editor")
+            .or_else(|_| Err(DuckErrors::TODO))?
             .wait()
-            .expect("bad exit code from closing editor");
+            .or_else(|_| Err(DuckErrors::TODO))?;
 
-        fs::read_to_string(TEMP_FILE_PATH).unwrap()
+        if let Ok(out) = fs::read_to_string(TEMP_FILE_PATH) {
+            return Ok(out);
+        }
+        return Err(DuckErrors::TODO);
+    }
+
+    /// runs git add {stdin}
+    fn add_file(self, file_name: String) -> Result<String, DuckErrors> {
+        let cmd_to_add_file = self.get_cli_command() + " " + &file_name;
+        let output = Command::new("sh")
+            .arg("-c")
+            .arg(cmd_to_add_file)
+            .output()
+            .or_else(|_| Err(DuckErrors::TODO))?;
+
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        if !stderr.is_empty() {
+            return Err(DuckErrors::TODO);
+        }
+
+        let displayable_output = DisplayableCliCommand(output);
+        Ok(displayable_output.to_string())
     }
 
     /// runs a generic cli command
     /// returns a string of the output
-    fn run_generic_command(self) -> String {
+    fn run_generic_command(self) -> Result<String, DuckErrors> {
         let output = Command::new("sh")
             .arg("-c")
             .arg(self.get_cli_command())
             .output()
-            .expect("failed to execute process");
+            .or_else(|_| Err(DuckErrors::TODO))?;
+
+        let stderr = String::from_utf8_lossy(&output.stderr);
+
+        if !stderr.is_empty() {
+            return Err(DuckErrors::TODO);
+        }
+
         let displayable_output = DisplayableCliCommand(output);
-        displayable_output.to_string()
+        Ok(displayable_output.to_string())
+    }
+
+    /// gets the default editor the system
+    fn get_editor(&self) -> String {
+        var("EDITOR").unwrap_or("vi".to_string())
     }
 }

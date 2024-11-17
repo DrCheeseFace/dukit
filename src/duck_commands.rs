@@ -1,6 +1,5 @@
+use crate::{base_commands::BaseCliCommands, INTERACTIVE_ADD_HELP, LINE_SEPERATOR};
 use termion::color;
-
-use crate::base_commands::BaseCliCommands;
 
 pub enum DuckCommands {
     Status,
@@ -13,6 +12,7 @@ impl DuckCommands {
     pub fn run(&self) {
         match self {
             DuckCommands::Status => self.duck_file_status(),
+            // TODO
             DuckCommands::Branch => self.duck_current_branch(),
             DuckCommands::Add => self.duck_interactive_add(),
         }
@@ -20,7 +20,13 @@ impl DuckCommands {
 
     /// pretty git status for files output
     fn duck_file_status(&self) {
-        let out = BaseCliCommands::Status.run(None);
+        let out = match BaseCliCommands::Status.run(None) {
+            Ok(output) => output,
+            Err(e) => {
+                e.printout();
+                return;
+            }
+        };
         let mut v: Vec<&str> = out.split('\n').collect();
 
         // find a better way
@@ -80,17 +86,108 @@ impl DuckCommands {
     /// pretty git status output for current branch info
     fn duck_current_branch(&self) {
         let mut out = String::new();
-        let cmdout = BaseCliCommands::RemoteBranch.run(None);
+        let cmdout = match BaseCliCommands::RemoteBranch.run(None) {
+            Ok(output) => output,
+            Err(e) => {
+                e.printout();
+                return;
+            }
+        };
         out.push_str(&cmdout.to_string().trim());
         out.push_str("\n");
-        let cmdout = BaseCliCommands::CurrentBranch.run(None);
+        let cmdout = match BaseCliCommands::CurrentBranch.run(None) {
+            Ok(output) => output,
+            Err(e) => {
+                e.printout();
+                return;
+            }
+        };
         out.push_str(&cmdout.to_string());
 
-        println!("\n{}{}", color::Fg(color::Magenta), out.trim().to_string())
+        println!("\n{}{}", color::Fg(color::Magenta), out.trim().to_string());
     }
 
     fn duck_interactive_add(&self) {
-        let cmdout = BaseCliCommands::OpenEditor.run(Some("is this working".to_string()));
-        println!("{}", cmdout);
+        let out = match BaseCliCommands::Status.run(None) {
+            Ok(output) => output,
+            Err(e) => {
+                e.printout();
+                return;
+            }
+        };
+        let mut v: Vec<&str> = out.split('\n').collect();
+
+        // find a better way
+        v.pop();
+        v.pop();
+
+        let mut staged: Vec<&str> = Vec::new();
+        let mut unstaged: Vec<&str> = Vec::new();
+
+        for line in v {
+            let split: (&str, &str) = line.split_at(2);
+            let file = split.1;
+            let state = split.0;
+
+            if state.chars().nth(0).unwrap() != ' ' && state.chars().nth(0).unwrap() != '?' {
+                staged.push(file)
+            } else if state.chars().nth(1).unwrap() == 'M' {
+                unstaged.push(file)
+            } else {
+                unstaged.push(file)
+            }
+        }
+
+        let mut stdin = String::new();
+        if !staged.is_empty() {
+            stdin.push_str("# Staged\n");
+            for i in staged {
+                stdin.push_str(i);
+                stdin.push_str("\n");
+            }
+        }
+
+        stdin.push_str("\n");
+        stdin.push_str(LINE_SEPERATOR);
+
+        if !unstaged.is_empty() {
+            stdin.push_str("\n\n# Unstaged\n");
+            for i in &unstaged {
+                stdin.push_str("[ ]");
+                stdin.push_str(i);
+                stdin.push_str("\n");
+            }
+        }
+        stdin.push_str("\n");
+        stdin.push_str(INTERACTIVE_ADD_HELP);
+
+        let textout = match BaseCliCommands::OpenEditor.run(Some(stdin)) {
+            Ok(output) => output,
+            Err(e) => {
+                e.printout();
+                return;
+            }
+        };
+
+        let lines: Vec<&str> = textout.split('\n').collect();
+        let line_seperator_index = lines.iter().position(|&s| s == LINE_SEPERATOR).unwrap();
+        let mut to_be_added: Vec<&str> = Vec::new();
+        for line in lines[line_seperator_index + 1..lines.len()].to_vec() {
+            if !line.contains("#") && line.contains("[x]") {
+                to_be_added.push(line.strip_prefix("[x] ").unwrap())
+            }
+        }
+
+        for file in to_be_added {
+            println!("{}\nrunning git add {} ", color::Fg(color::Yellow), file);
+            let _ = match BaseCliCommands::AddFile.run(Some(file.to_string())) {
+                Ok(output) => output,
+                Err(e) => {
+                   e.printout();
+                    return;
+                }
+            };
+            println!("{}{} staged ", color::Fg(color::Green), file);
+        }
     }
 }

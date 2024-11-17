@@ -1,8 +1,12 @@
 pub mod base_commands;
 pub mod duck_commands;
-use std::{env::var, process::Output};
+pub mod errors;
+use std::process::Output;
 
-const TEMP_FILE_PATH: &str = "/tmp/duk.txt";
+const TEMP_FILE_PATH: &str = "/tmp/duk.md";
+
+const LINE_SEPERATOR: &str = "# -------------------------------------";
+const INTERACTIVE_ADD_HELP: &str = "# Selected files to be staged like so below V\n# [x] file.txt\n# Lines begining with (#) will be ignored";
 
 #[derive(Debug)]
 pub struct DisplayableCliCommand(Output);
@@ -18,11 +22,3 @@ impl std::fmt::Display for DisplayableCliCommand {
         return writeln!(f, "{}", stderr);
     }
 }
-
-
-/// gets the default editor the system 
-fn get_editor() -> String {
-    var("EDITOR").unwrap_or("vi".to_string())
-}
-
-
