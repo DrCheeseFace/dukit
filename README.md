@@ -4,10 +4,11 @@ For the orange\yellow bill inclined amongst us
 - Tha goal is a git cli wrapper that does 95% of what you need to do but SUPER slick.
 - gota be able to yank text from the terminal with EASE
 
+![demo](demo.gif)
 
 ## Usage
-
-git status command (default method) but copy pasteable
+### Status info
+`git status` command (default method) but copy pasteable
 ```sh
 > duk 
 
@@ -22,7 +23,8 @@ git status command (default method) but copy pasteable
   README.md
   duck.gif
 ```
-notice how easy copy pasting should be 
+### Branch info 
+Notice how easy copy pasting should be 
 
 ```sh
 > duk -b
@@ -31,6 +33,32 @@ notice how easy copy pasting should be
   main
 
 ```
+### Interactive `git add` 
+This opens your default editor with files to add
+
+```sh
+> duk -i
+
+# Staged
+ out.tape
+
+# -------------------------------------
+
+# Unstaged
+[ ] README.md
+[ ] .gitignore
+[x] demo.gif
+
+# Selected files to be staged like so below V
+# [x] file.txt
+# Lines begining with (#) will be ignored
+
+> running git add demo.gif
+  demo.gif staged
+
+```
+
+
 
 ## Contributing
 - If you want to suggest a feature put in an issue with the feature request.
@@ -42,7 +70,7 @@ notice how easy copy pasting should be
 - [ ] what is up docs 
 - [x] status info
 - [x] branch and remote info
-- [ ] git add using editor
+- [x] git add using editor
 - [ ] git switch branch using editor
 - [ ] fuzzy branch switching?
 - [ ] ez stash and poppin info 
