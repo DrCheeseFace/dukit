@@ -10,7 +10,7 @@ For the orange\yellow bill inclined amongst us
 ### Status info
 `git status` command (default method) but copy pasteable
 ```sh
-> duk 
+> dukit
 
   S
   src/lib.rs
@@ -27,7 +27,7 @@ For the orange\yellow bill inclined amongst us
 Notice how easy copy pasting should be 
 
 ```sh
-> duk -b
+> dukit -b
 
   Your branch is ahead of 'origin/main' by 2 commits.
   main
@@ -37,7 +37,7 @@ Notice how easy copy pasting should be
 This opens your default editor with files to add
 
 ```sh
-> duk -i
+> dukit -i
 
 # Staged
  out.tape
