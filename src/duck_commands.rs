@@ -177,7 +177,7 @@ impl DuckCommands {
             }
             stdin.push('\n');
         }
-        stdin.push_str(LINE_SEPERATOR);
+        stdin.push_str(&format!("{} {}\n", COMMENT_CHAR, LINE_SEPERATOR));
         stdin.push_str("\n\n");
 
         if !unstaged.is_empty() {
@@ -200,7 +200,7 @@ impl DuckCommands {
         };
 
         let lines: Vec<&str> = textout.split('\n').collect();
-        let line_seperator_index = match lines.iter().position(|&s| s == LINE_SEPERATOR) {
+        let line_seperator_index = match lines.iter().position(|&s| s.contains(LINE_SEPERATOR)) {
             Some(output) => output,
             None => {
                 DuckErrors::TODO.printout();
