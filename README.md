@@ -57,6 +57,10 @@ This opens your default editor with files to add
   demo.gif staged
 
 ```
+## Installation
+```
+cargo install dukit
+```
 
 
 
