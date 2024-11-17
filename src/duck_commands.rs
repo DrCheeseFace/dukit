@@ -1,4 +1,7 @@
-use crate::{base_commands::BaseCliCommands, INTERACTIVE_ADD_HELP, LINE_SEPERATOR};
+use crate::{
+    base_commands::BaseCliCommands, DELETED_CHAR, EMPTY_CHAR, INTERACTIVE_ADD_HELP, LINE_SEPERATOR,
+    MODIFIED_CHAR, UNTRACKED_CHAR,
+};
 use termion::color;
 
 pub enum DuckCommands {
@@ -12,7 +15,6 @@ impl DuckCommands {
     pub fn run(&self) {
         match self {
             DuckCommands::Status => self.duck_file_status(),
-            // TODO
             DuckCommands::Branch => self.duck_current_branch(),
             DuckCommands::Add => self.duck_interactive_add(),
         }
@@ -43,16 +45,18 @@ impl DuckCommands {
             let file = split.1;
             let state = split.0;
 
-            if state.chars().nth(0).unwrap() != ' ' && state.chars().nth(0).unwrap() != '?' {
+            if state.chars().nth(0).unwrap() != EMPTY_CHAR
+                && state.chars().nth(0).unwrap() != UNTRACKED_CHAR
+            {
                 a.push(file)
             }
-            if state.chars().nth(1).unwrap() == 'M' {
+            if state.chars().nth(1).unwrap() == MODIFIED_CHAR {
                 m.push(file)
             }
-            if state.chars().nth(1).unwrap() == '?' {
+            if state.chars().nth(1).unwrap() == UNTRACKED_CHAR {
                 u.push(file)
             }
-            if state.chars().nth(1).unwrap() == 'D' {
+            if state.chars().nth(1).unwrap() == DELETED_CHAR {
                 d.push(file)
             }
         }
@@ -93,8 +97,8 @@ impl DuckCommands {
                 return;
             }
         };
-        out.push_str(&cmdout.to_string().trim());
-        out.push_str("\n");
+        out.push_str(cmdout.to_string().trim());
+        out.push('\n');
         let cmdout = match BaseCliCommands::CurrentBranch.run(None) {
             Ok(output) => output,
             Err(e) => {
@@ -104,7 +108,7 @@ impl DuckCommands {
         };
         out.push_str(&cmdout.to_string());
 
-        println!("\n{}{}", color::Fg(color::Magenta), out.trim().to_string());
+        println!("\n{}{}", color::Fg(color::Magenta), out.trim());
     }
 
     fn duck_interactive_add(&self) {
@@ -129,10 +133,10 @@ impl DuckCommands {
             let file = split.1;
             let state = split.0;
 
-            if state.chars().nth(0).unwrap() != ' ' && state.chars().nth(0).unwrap() != '?' {
+            if state.chars().nth(0).unwrap() != EMPTY_CHAR
+                && state.chars().nth(0).unwrap() != UNTRACKED_CHAR
+            {
                 staged.push(file)
-            } else if state.chars().nth(1).unwrap() == 'M' {
-                unstaged.push(file)
             } else {
                 unstaged.push(file)
             }
@@ -143,11 +147,11 @@ impl DuckCommands {
             stdin.push_str("# Staged\n");
             for i in staged {
                 stdin.push_str(i);
-                stdin.push_str("\n");
+                stdin.push('\n');
             }
         }
 
-        stdin.push_str("\n");
+        stdin.push('\n');
         stdin.push_str(LINE_SEPERATOR);
 
         if !unstaged.is_empty() {
@@ -155,10 +159,10 @@ impl DuckCommands {
             for i in &unstaged {
                 stdin.push_str("[ ]");
                 stdin.push_str(i);
-                stdin.push_str("\n");
+                stdin.push('\n');
             }
         }
-        stdin.push_str("\n");
+        stdin.push('\n');
         stdin.push_str(INTERACTIVE_ADD_HELP);
 
         let textout = match BaseCliCommands::OpenEditor.run(Some(stdin)) {
@@ -172,8 +176,8 @@ impl DuckCommands {
         let lines: Vec<&str> = textout.split('\n').collect();
         let line_seperator_index = lines.iter().position(|&s| s == LINE_SEPERATOR).unwrap();
         let mut to_be_added: Vec<&str> = Vec::new();
-        for line in lines[line_seperator_index + 1..lines.len()].to_vec() {
-            if !line.contains("#") && line.contains("[x]") {
+        for line in &lines[line_seperator_index + 1..lines.len()] {
+            if !line.contains('#') && line.contains("[x]") {
                 to_be_added.push(line.strip_prefix("[x] ").unwrap())
             }
         }
@@ -183,7 +187,7 @@ impl DuckCommands {
             let _ = match BaseCliCommands::AddFile.run(Some(file.to_string())) {
                 Ok(output) => output,
                 Err(e) => {
-                   e.printout();
+                    e.printout();
                     return;
                 }
             };

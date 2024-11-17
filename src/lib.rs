@@ -8,6 +8,11 @@ const TEMP_FILE_PATH: &str = "/tmp/duk.md";
 const LINE_SEPERATOR: &str = "# -------------------------------------";
 const INTERACTIVE_ADD_HELP: &str = "# Selected files to be staged like so below V\n# [x] file.txt\n# Lines begining with (#) will be ignored";
 
+const MODIFIED_CHAR: char = 'M';
+const UNTRACKED_CHAR: char = '?';
+const DELETED_CHAR: char = 'D';
+const EMPTY_CHAR: char = ' ';
+
 #[derive(Debug)]
 pub struct DisplayableCliCommand(Output);
 
@@ -19,6 +24,6 @@ impl std::fmt::Display for DisplayableCliCommand {
         if stderr.is_empty() {
             return writeln!(f, "{}", stdout);
         }
-        return writeln!(f, "{}", stderr);
+        writeln!(f, "{}", stderr)
     }
 }

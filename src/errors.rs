@@ -17,9 +17,9 @@ impl std::fmt::Display for DuckErrors {
 impl DuckErrors {
     pub fn printout(&self) {
         eprintln!(
-            "{} Error while running 'duck command': {:?}",
+            "{} Error while running 'duck command': {}",
             color::Fg(color::Red),
-            self.to_string()
+            self
         );
     }
 }

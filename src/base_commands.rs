@@ -50,14 +50,14 @@ impl BaseCliCommands {
         Command::new(self.get_editor())
             .arg(TEMP_FILE_PATH)
             .spawn()
-            .or_else(|_| Err(DuckErrors::TODO))?
+            .map_err(|_| DuckErrors::TODO)?
             .wait()
-            .or_else(|_| Err(DuckErrors::TODO))?;
+            .map_err(|_| DuckErrors::TODO)?;
 
         if let Ok(out) = fs::read_to_string(TEMP_FILE_PATH) {
             return Ok(out);
         }
-        return Err(DuckErrors::TODO);
+        Err(DuckErrors::TODO)
     }
 
     /// runs git add {stdin}
@@ -67,7 +67,7 @@ impl BaseCliCommands {
             .arg("-c")
             .arg(cmd_to_add_file)
             .output()
-            .or_else(|_| Err(DuckErrors::TODO))?;
+            .map_err(|_| DuckErrors::TODO)?;
 
         let stderr = String::from_utf8_lossy(&output.stderr);
         if !stderr.is_empty() {
@@ -85,7 +85,7 @@ impl BaseCliCommands {
             .arg("-c")
             .arg(self.get_cli_command())
             .output()
-            .or_else(|_| Err(DuckErrors::TODO))?;
+            .map_err(|_| DuckErrors::TODO)?;
 
         let stderr = String::from_utf8_lossy(&output.stderr);
 

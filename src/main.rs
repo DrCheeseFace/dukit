@@ -22,7 +22,7 @@ struct Args {
 fn main() {
     let args = Args::parse();
     if args.branch {
-        let _ = DuckCommands::Branch.run();
+        DuckCommands::Branch.run();
     } else if args.iadd {
         DuckCommands::Add.run();
     } else if args.status {
@@ -32,7 +32,6 @@ fn main() {
 
 #[cfg(test)]
 mod test {
-    use super::*;
 
     #[test]
     fn sanity_check() {
