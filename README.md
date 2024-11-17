@@ -29,7 +29,9 @@ Notice how easy copy pasting should be
 ```sh
 > dukit -b
 
-  Your branch is ahead of 'origin/main' by 2 commits.
+  Your branch is up to date with 'origin/main'.
+
+  feature/git-switch-interactive
   main
 
 ```

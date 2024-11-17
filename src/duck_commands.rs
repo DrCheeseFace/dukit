@@ -1,8 +1,8 @@
 use crate::{
-    base_commands::BaseCliCommands, errors::DuckErrors, COMMENT_CHAR, DELETED_CHAR, DELETED_LABEL,
-    EMPTY_CHAR, INTERACTIVE_ADD_HELP, LINE_SEPERATOR, MODIFIED_CHAR, MODIFIED_LABEL,
-    NOTHING_TO_COMMIT_MESSAGE, RUNNING_GIT_ADD, STAGED_LABEL, TICKED_BOX, UNSTAGED_LABEL,
-    UNTRACKED_CHAR, UNTRACKED_LABEL,
+    base_commands::BaseCliCommands, errors::DuckErrors, COMMENT_CHAR, CURRENT_BRANCH_CHAR,
+    DELETED_CHAR, DELETED_LABEL, EMPTY_CHAR, INTERACTIVE_ADD_HELP, LINE_SEPERATOR, MODIFIED_CHAR,
+    MODIFIED_LABEL, NOTHING_TO_COMMIT_MESSAGE, NO_REMOTE_INFO, RUNNING_GIT_ADD, STAGED_LABEL,
+    TICKED_BOX, UNSTAGED_LABEL, UNTRACKED_CHAR, UNTRACKED_LABEL,
 };
 use termion::color;
 
@@ -17,7 +17,7 @@ impl DuckCommands {
     pub fn run(&self) {
         match self {
             DuckCommands::Status => self.duck_file_status(),
-            DuckCommands::Branch => self.duck_current_branch(),
+            DuckCommands::Branch => self.duck_branch(),
             DuckCommands::Add => self.duck_interactive_add(),
         }
     }
@@ -98,9 +98,8 @@ impl DuckCommands {
         }
     }
 
-    /// pretty git status output for current branch info
-    fn duck_current_branch(&self) {
-        let mut out = String::new();
+    /// pretty git status output for branch info
+    fn duck_branch(&self) {
         let cmdout = match BaseCliCommands::RemoteBranch.run(None) {
             Ok(output) => output,
             Err(e) => {
@@ -108,18 +107,34 @@ impl DuckCommands {
                 return;
             }
         };
-        out.push_str(cmdout.to_string().trim());
-        out.push('\n');
-        let cmdout = match BaseCliCommands::CurrentBranch.run(None) {
+        if !cmdout.trim().is_empty() {
+            println!("\n{}{}\n", color::Fg(color::Cyan), cmdout.trim());
+        } else {
+            println!("\n{}{}\n", color::Fg(color::Cyan), NO_REMOTE_INFO);
+        }
+        let cmdout = match BaseCliCommands::BranchList.run(None) {
             Ok(output) => output,
             Err(e) => {
                 e.printout();
                 return;
             }
         };
-        out.push_str(&cmdout.to_string());
 
-        println!("\n{}{}", color::Fg(color::Magenta), out.trim());
+        let branches: Vec<&str> = cmdout.trim().split('\n').collect();
+        for branch in &branches {
+            if branch.chars().nth(0).unwrap() == CURRENT_BRANCH_CHAR {
+                let branch = match branch.strip_prefix(CURRENT_BRANCH_CHAR) {
+                    Some(output) => output.trim(),
+                    None => {
+                        DuckErrors::TODO.printout();
+                        return;
+                    }
+                };
+                println!("{}{}", color::Fg(color::Green), branch);
+            } else {
+                println!("{}{}", color::Fg(color::Yellow), branch);
+            }
+        }
     }
 
     fn duck_interactive_add(&self) {
@@ -155,18 +170,18 @@ impl DuckCommands {
 
         let mut stdin = String::new();
         if !staged.is_empty() {
-            stdin.push_str(&format!("# {}\n", STAGED_LABEL));
+            stdin.push_str(&format!("{} {}\n", COMMENT_CHAR, STAGED_LABEL));
             for i in staged {
                 stdin.push_str(i);
                 stdin.push('\n');
             }
+            stdin.push('\n');
         }
-
-        stdin.push('\n');
         stdin.push_str(LINE_SEPERATOR);
+        stdin.push_str("\n\n");
 
         if !unstaged.is_empty() {
-            stdin.push_str(&format!("\n\n# {}\n", UNSTAGED_LABEL));
+            stdin.push_str(&format!("{} {}\n", COMMENT_CHAR, UNSTAGED_LABEL));
             for i in &unstaged {
                 stdin.push_str("[ ]");
                 stdin.push_str(i);

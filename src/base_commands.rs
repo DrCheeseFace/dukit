@@ -9,7 +9,7 @@ use std::{
 
 pub enum BaseCliCommands {
     Status,
-    CurrentBranch,
+    BranchList,
     RemoteBranch,
     OpenEditor,
     AddFile,
@@ -30,7 +30,7 @@ impl BaseCliCommands {
     fn get_cli_command(&self) -> String {
         match self {
             BaseCliCommands::Status => "git status -s".to_string(),
-            BaseCliCommands::CurrentBranch => "git branch --show-current".to_string(),
+            BaseCliCommands::BranchList => "git branch -l".to_string(),
             BaseCliCommands::RemoteBranch => {
                 "git status -uno | grep -E 'Your branch is (ahead|behind|up to date)'".to_string()
             }
