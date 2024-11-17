@@ -1,9 +1,13 @@
 [package]
-name = "duk"
+name = "dukit"
 version = "0.1.0"
 edition = "2021"
+authors =[  "Tharun <tharun1@hotmail.co.uk>" ]
+description = "git cli tool for the feathered"
+repository = "https://github.com/DrCheeseFace/dukit"
+license = "MIT"
+readme = "README.md"
 
 [dependencies]
 clap = { version = "4.5.20", features = ["derive"] }
-termion = "*"
-
+termion = "4.0.3"

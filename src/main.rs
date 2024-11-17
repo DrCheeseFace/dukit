@@ -1,5 +1,5 @@
 use clap::Parser;
-use duk::duck_commands::DuckCommands;
+use dukit::duck_commands::DuckCommands;
 use std::str;
 
 /// git for ducks
