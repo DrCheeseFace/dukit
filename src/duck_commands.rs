@@ -69,6 +69,7 @@ impl DuckCommands {
                 color::Fg(color::Green),
                 NOTHING_TO_COMMIT_MESSAGE
             );
+            return;
         }
 
         if !a.is_empty() {
