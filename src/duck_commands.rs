@@ -1,6 +1,8 @@
 use crate::{
-    base_commands::BaseCliCommands, errors::DuckErrors, DELETED_CHAR, EMPTY_CHAR,
-    INTERACTIVE_ADD_HELP, LINE_SEPERATOR, MODIFIED_CHAR, UNTRACKED_CHAR,
+    base_commands::BaseCliCommands, errors::DuckErrors, COMMENT_CHAR, DELETED_CHAR, DELETED_LABEL,
+    EMPTY_CHAR, INTERACTIVE_ADD_HELP, LINE_SEPERATOR, MODIFIED_CHAR, MODIFIED_LABEL,
+    NOTHING_TO_COMMIT_MESSAGE, RUNNING_GIT_ADD, STAGED_LABEL, TICKED_BOX, UNSTAGED_LABEL,
+    UNTRACKED_CHAR, UNTRACKED_LABEL,
 };
 use termion::color;
 
@@ -40,7 +42,7 @@ impl DuckCommands {
         let mut u: Vec<&str> = Vec::new();
         let mut d: Vec<&str> = Vec::new();
 
-        for line in v {
+        for line in &v {
             let split: (&str, &str) = line.split_at(2);
             let file = split.1;
             let state = split.0;
@@ -61,26 +63,34 @@ impl DuckCommands {
             }
         }
 
+        if v.is_empty() {
+            println!(
+                "{}\n {}",
+                color::Fg(color::Green),
+                NOTHING_TO_COMMIT_MESSAGE
+            );
+        }
+
         if !a.is_empty() {
-            println!("{}\n S", color::Fg(color::Green));
+            println!("{}\n {}", color::Fg(color::Green), STAGED_LABEL);
             for i in a {
                 println!("{}{}", color::Fg(color::LightGreen), i);
             }
         }
         if !m.is_empty() {
-            println!("{}\n M", color::Fg(color::Yellow));
+            println!("{}\n {}", color::Fg(color::Yellow), MODIFIED_LABEL);
             for i in m {
                 println!("{}{}", color::Fg(color::LightYellow), i);
             }
         }
         if !u.is_empty() {
-            println!("{}\n U", color::Fg(color::Red));
+            println!("{}\n {}", color::Fg(color::Red), UNTRACKED_LABEL);
             for i in u {
                 println!("{}{}", color::Fg(color::LightRed), i);
             }
         }
         if !d.is_empty() {
-            println!("{}\n D", color::Fg(color::Red));
+            println!("{}\n {}", color::Fg(color::Red), DELETED_LABEL);
             for i in d {
                 println!("{}{}", color::Fg(color::LightRed), i);
             }
@@ -144,7 +154,7 @@ impl DuckCommands {
 
         let mut stdin = String::new();
         if !staged.is_empty() {
-            stdin.push_str("# Staged\n");
+            stdin.push_str(&format!("# {}\n", STAGED_LABEL));
             for i in staged {
                 stdin.push_str(i);
                 stdin.push('\n');
@@ -155,7 +165,7 @@ impl DuckCommands {
         stdin.push_str(LINE_SEPERATOR);
 
         if !unstaged.is_empty() {
-            stdin.push_str("\n\n# Unstaged\n");
+            stdin.push_str(&format!("\n\n# {}\n", UNSTAGED_LABEL));
             for i in &unstaged {
                 stdin.push_str("[ ]");
                 stdin.push_str(i);
@@ -184,8 +194,8 @@ impl DuckCommands {
 
         let mut to_be_added: Vec<&str> = Vec::new();
         for line in &lines[line_seperator_index + 1..lines.len()] {
-            if !line.contains('#') && line.contains("[x]") {
-                let line = match line.strip_prefix("[x] ") {
+            if !line.contains(COMMENT_CHAR) && line.contains(TICKED_BOX) {
+                let line = match line.strip_prefix(TICKED_BOX) {
                     Some(output) => output,
                     None => {
                         DuckErrors::TODO.printout();
@@ -198,7 +208,12 @@ impl DuckCommands {
         }
 
         for file in to_be_added {
-            println!("{}\nrunning git add {} ", color::Fg(color::Yellow), file);
+            println!(
+                "{}\n {} {} ",
+                color::Fg(color::Yellow),
+                RUNNING_GIT_ADD,
+                file
+            );
             match BaseCliCommands::AddFile.run(Some(file.to_string())) {
                 Ok(output) => output,
                 Err(e) => {
@@ -206,7 +221,7 @@ impl DuckCommands {
                     return;
                 }
             };
-            println!("{}{} staged ", color::Fg(color::Green), file);
+            println!("{}{} {}", color::Fg(color::Green), file, STAGED_LABEL);
         }
     }
 }
