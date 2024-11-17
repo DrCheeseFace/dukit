@@ -43,8 +43,9 @@ impl BaseCliCommands {
     /// opens editor with given stdin to display to user
     /// returns a string of the saved file on exit
     fn open_editor(self, stdin: String) -> Result<String, DuckErrors> {
-        let mut file = File::create(TEMP_FILE_PATH).unwrap();
-        file.write_all(stdin.as_bytes()).unwrap();
+        let mut file = File::create(TEMP_FILE_PATH).map_err(|_| DuckErrors::TODO)?;
+        file.write_all(stdin.as_bytes())
+            .map_err(|_| DuckErrors::TODO)?;
         drop(file);
 
         Command::new(self.get_editor())

@@ -9,7 +9,7 @@ pub enum DuckErrors {
 impl std::fmt::Display for DuckErrors {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::TODO => write!(f, "Generic error here!"),
+            Self::TODO => write!(f, "ruh roh raggy!"),
         }
     }
 }

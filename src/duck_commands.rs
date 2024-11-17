@@ -1,6 +1,6 @@
 use crate::{
-    base_commands::BaseCliCommands, DELETED_CHAR, EMPTY_CHAR, INTERACTIVE_ADD_HELP, LINE_SEPERATOR,
-    MODIFIED_CHAR, UNTRACKED_CHAR,
+    base_commands::BaseCliCommands, errors::DuckErrors, DELETED_CHAR, EMPTY_CHAR,
+    INTERACTIVE_ADD_HELP, LINE_SEPERATOR, MODIFIED_CHAR, UNTRACKED_CHAR,
 };
 use termion::color;
 
@@ -174,17 +174,32 @@ impl DuckCommands {
         };
 
         let lines: Vec<&str> = textout.split('\n').collect();
-        let line_seperator_index = lines.iter().position(|&s| s == LINE_SEPERATOR).unwrap();
+        let line_seperator_index = match lines.iter().position(|&s| s == LINE_SEPERATOR) {
+            Some(output) => output,
+            None => {
+                DuckErrors::TODO.printout();
+                return;
+            }
+        };
+
         let mut to_be_added: Vec<&str> = Vec::new();
         for line in &lines[line_seperator_index + 1..lines.len()] {
             if !line.contains('#') && line.contains("[x]") {
-                to_be_added.push(line.strip_prefix("[x] ").unwrap())
+                let line = match line.strip_prefix("[x] ") {
+                    Some(output) => output,
+                    None => {
+                        DuckErrors::TODO.printout();
+                        return;
+                    }
+                };
+
+                to_be_added.push(line)
             }
         }
 
         for file in to_be_added {
             println!("{}\nrunning git add {} ", color::Fg(color::Yellow), file);
-            let _ = match BaseCliCommands::AddFile.run(Some(file.to_string())) {
+            match BaseCliCommands::AddFile.run(Some(file.to_string())) {
                 Ok(output) => output,
                 Err(e) => {
                     e.printout();
