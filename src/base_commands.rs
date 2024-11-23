@@ -21,9 +21,9 @@ impl BaseCliCommands {
     /// runs command and returns output as a string
     pub fn run(self, stdin: Option<String>) -> Result<String, DuckErrors> {
         match self {
-            BaseCliCommands::OpenEditor => self.open_editor(stdin.unwrap_or_default()),
-            BaseCliCommands::AddFile => self.add_file(stdin.unwrap_or_default()),
-            BaseCliCommands::GitSwitch => self.switch_branch(stdin.unwrap_or_default()),
+            BaseCliCommands::OpenEditor => self.open_editor(stdin),
+            BaseCliCommands::AddFile => self.add_file(stdin),
+            BaseCliCommands::GitSwitch => self.switch_branch(stdin),
             _ => self.run_generic_command(),
         }
     }
@@ -44,7 +44,9 @@ impl BaseCliCommands {
     }
 
     /// switches to given branch
-    fn switch_branch(self, branch_name: String) -> Result<String, DuckErrors> {
+    fn switch_branch(self, branch_name: Option<String>) -> Result<String, DuckErrors> {
+        let branch_name = branch_name.unwrap_or_default();
+
         let cmd_to_switch_branch = self.get_cli_command() + " " + &branch_name;
         let output = Command::new("sh")
             .arg("-c")
@@ -63,7 +65,8 @@ impl BaseCliCommands {
 
     /// opens editor with given stdin to display to user
     /// returns a string of the saved file on exit
-    fn open_editor(self, stdin: String) -> Result<String, DuckErrors> {
+    fn open_editor(self, stdin: Option<String>) -> Result<String, DuckErrors> {
+        let stdin = stdin.unwrap_or_default();
         let mut file =
             File::create(TEMP_FILE_PATH).map_err(|_| DuckErrors::CouldNotWriteToTempFile)?;
         file.write_all(stdin.as_bytes())
@@ -81,7 +84,8 @@ impl BaseCliCommands {
     }
 
     /// runs git add {stdin}
-    fn add_file(self, file_name: String) -> Result<String, DuckErrors> {
+    fn add_file(self, file_name: Option<String>) -> Result<String, DuckErrors> {
+        let file_name = file_name.unwrap_or_default();
         let cmd_to_add_file = self.get_cli_command() + " " + &file_name;
         let output = Command::new("sh")
             .arg("-c")

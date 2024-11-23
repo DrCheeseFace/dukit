@@ -92,7 +92,6 @@ apt install fzf
 - [x] git add using editor
 - [x] unwrap unwrap unwrap unwrap unwrap unwrap 
 - [x] fuzzy branch switching?
-- [ ] ez stash and poppin info 
 - [ ] nice git log info
 - [ ] ez copy commit hashes 
 - [ ] ez rebase
@@ -100,4 +99,3 @@ apt install fzf
 - [ ] random other git porcelein shizz 
 
 ![duck duck duck duck](duck.gif)
-
