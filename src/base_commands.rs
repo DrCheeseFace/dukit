@@ -1,5 +1,5 @@
 use crate::errors::DuckErrors;
-use crate::{DisplayableCliCommand, TEMP_FILE_PATH};
+use crate::{DisplayableCliCommand, GIT_SWITCH_UNCOMMITED_CHANGES_ERROR, TEMP_FILE_PATH};
 use std::{
     env::var,
     fs::{self, File},
@@ -13,7 +13,8 @@ pub enum BaseCliCommands {
     RemoteBranch,
     OpenEditor,
     AddFile,
-    Todo,
+    FzfGitBranch,
+    GitSwitch,
 }
 
 impl BaseCliCommands {
@@ -22,6 +23,7 @@ impl BaseCliCommands {
         match self {
             BaseCliCommands::OpenEditor => self.open_editor(stdin.unwrap_or_default()),
             BaseCliCommands::AddFile => self.add_file(stdin.unwrap_or_default()),
+            BaseCliCommands::GitSwitch => self.switch_branch(stdin.unwrap_or_default()),
             _ => self.run_generic_command(),
         }
     }
@@ -29,21 +31,41 @@ impl BaseCliCommands {
     /// gets the cli command as a string
     fn get_cli_command(&self) -> String {
         match self {
-            BaseCliCommands::Status => "git status -s".to_string(),
-            BaseCliCommands::BranchList => "git branch -l".to_string(),
-            BaseCliCommands::RemoteBranch => {
+            Self::Status => "git status -s".to_string(),
+            Self::BranchList => "git branch -l".to_string(),
+            Self::RemoteBranch => {
                 "git status -uno | grep -E 'Your branch is (ahead|behind|up to date)'".to_string()
             }
-            BaseCliCommands::OpenEditor => self.get_editor(),
-            BaseCliCommands::AddFile => "git add".to_string(),
-            BaseCliCommands::Todo => "echo 'hi :3'".to_string(),
+            Self::OpenEditor => self.get_editor(),
+            Self::AddFile => "git add".to_string(),
+            Self::FzfGitBranch => "git branch -l| grep '^[^*]' | fzf".to_string(),
+            Self::GitSwitch => "git switch".to_string(),
         }
+    }
+
+    /// switches to given branch
+    fn switch_branch(self, branch_name: String) -> Result<String, DuckErrors> {
+        let cmd_to_switch_branch = self.get_cli_command() + " " + &branch_name;
+        let output = Command::new("sh")
+            .arg("-c")
+            .arg(cmd_to_switch_branch)
+            .output()
+            .map_err(|_| DuckErrors::SpawnChildProccesForGeneric)?;
+
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        if stderr.contains(GIT_SWITCH_UNCOMMITED_CHANGES_ERROR) {
+            return Err(DuckErrors::LocalChangesOverwrittenByCheckout);
+        }
+
+        let displayable_output = DisplayableCliCommand(output);
+        Ok(displayable_output.to_string())
     }
 
     /// opens editor with given stdin to display to user
     /// returns a string of the saved file on exit
     fn open_editor(self, stdin: String) -> Result<String, DuckErrors> {
-        let mut file = File::create(TEMP_FILE_PATH).map_err(|_| DuckErrors::CouldNotWriteToTempFile)?;
+        let mut file =
+            File::create(TEMP_FILE_PATH).map_err(|_| DuckErrors::CouldNotWriteToTempFile)?;
         file.write_all(stdin.as_bytes())
             .map_err(|_| DuckErrors::CouldNotWriteToTempFile)?;
         drop(file);

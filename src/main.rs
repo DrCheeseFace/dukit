@@ -17,6 +17,10 @@ struct Args {
     /// interactive add
     #[arg(short, long, default_value_t = false)]
     iadd: bool,
+
+    /// fuzzy switch branch 
+    #[arg(short, long, default_value_t = false)]
+    fuzzybranch: bool,
 }
 
 fn main() {
@@ -25,6 +29,8 @@ fn main() {
         DuckCommands::Branch.run();
     } else if args.iadd {
         DuckCommands::Add.run();
+    } else if args.fuzzybranch {
+        DuckCommands::FuzzyBranchSwitch.run();
     } else if args.status {
         DuckCommands::Status.run();
     }

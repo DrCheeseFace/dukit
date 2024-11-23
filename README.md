@@ -10,18 +10,17 @@ For the orange\yellow bill inclined amongst us
 ### Status info
 `git status` command (default method) but copy pasteable
 ```sh
-> dukit
+> dukit -b
 
-  S
-  src/lib.rs
+ Staged
+ src/lib.rs
 
-  M
-  src/lib.rs
+ Modified
+ README.md
+ src/base_commands.rs
 
-  U
-  .gitignore
-  README.md
-  duck.gif
+ Untracked
+ hi.txt
 ```
 ### Branch info 
 Notice how easy copy pasting should be 
@@ -35,6 +34,21 @@ Notice how easy copy pasting should be
   main
 
 ```
+
+### Fuzzy branch switching 
+```sh
+> dukit -f
+
+ #opens fzf
+    test2
+    test1
+▌   feature/git-switch-interactive
+  3/3 ─────────────────────────────────────────────────────────────
+> {search bar here}
+
+ Switched to branch 'feature/git-switch-interactive'
+```
+
 ### Interactive `git add` 
 This opens your default editor with files to add
 
@@ -62,6 +76,7 @@ This opens your default editor with files to add
 ## Installation
 ```
 cargo install dukit
+apt install fzf
 ```
 
 
@@ -72,14 +87,11 @@ cargo install dukit
 - If you want to contribute code, make a pull request. anything short of a war crime will probably be accepted.
 
 ## TODO
-- [ ] testing NO CLUE 
-- [ ] what is up docs 
 - [x] status info
 - [x] branch and remote info
 - [x] git add using editor
 - [x] unwrap unwrap unwrap unwrap unwrap unwrap 
-- [ ] git switch branch using editor
-- [ ] fuzzy branch switching?
+- [x] fuzzy branch switching?
 - [ ] ez stash and poppin info 
 - [ ] nice git log info
 - [ ] ez copy commit hashes 

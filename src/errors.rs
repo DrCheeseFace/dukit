@@ -1,6 +1,5 @@
 use termion::color;
 
-//TODO return the correct thangs
 #[derive(Debug)]
 pub enum DuckErrors {
     Fuck,
@@ -11,7 +10,10 @@ pub enum DuckErrors {
     CouldNotWriteToTempFile,
     SpawnChildProccesForGeneric,
     NoMatchingLineSeperatorFound,
-    CouldNotReadTempFile
+    CouldNotReadTempFile,
+    LocalChangesOverwrittenByCheckout,
+    GitSwitchGeneric,
+    NoBranchGiven,
 }
 
 impl std::fmt::Display for DuckErrors {
@@ -25,17 +27,16 @@ impl std::fmt::Display for DuckErrors {
             Self::CouldNotWriteToTempFile => write!(f, "could not write to temp file"),
             Self::SpawnChildProccesForGeneric => write!(f, "could not spawn child process for command"),
             Self::NoMatchingLineSeperatorFound=> write!(f, "could not find matching line seperator. (dont mess with the stuff thats commented)"),
-            Self::CouldNotReadTempFile=> write!(f, "could not read temp file")
+            Self::CouldNotReadTempFile=> write!(f, "could not read temp file"),
+            Self::LocalChangesOverwrittenByCheckout=> write!(f, "Your local changes would be overwritten. commit or stash your changes"),
+            Self::GitSwitchGeneric=> write!(f, "could not run git switch"),
+            Self::NoBranchGiven=> write!(f, "no branch name given")
         }
     }
 }
 
 impl DuckErrors {
     pub fn printout(&self) {
-        eprintln!(
-            "{} Error while running 'duck command': {}",
-            color::Fg(color::Red),
-            self
-        );
+        eprintln!("{} \nError: {}", color::Fg(color::Red), self);
     }
 }

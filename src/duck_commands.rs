@@ -1,22 +1,52 @@
-use crate::{
-    base_commands::BaseCliCommands, errors::DuckErrors, COMMENT_CHAR, CURRENT_BRANCH_CHAR, DELETED_CHAR, DELETED_LABEL, EMPTY_CHAR, INTERACTIVE_ADD_HELP, LINE_SEPERATOR, MODIFIED_CHAR, MODIFIED_LABEL, NOTHING_TO_COMMIT_MESSAGE, NO_FILES_SELECTED_TO_ADD, NO_REMOTE_INFO, RUNNING_GIT_ADD, STAGED_LABEL, TICKED_BOX, UNSTAGED_LABEL, UNTRACKED_CHAR, UNTRACKED_LABEL
-};
 use termion::color;
+
+use crate::{
+    base_commands::BaseCliCommands, errors::DuckErrors, COMMENT_CHAR, CURRENT_BRANCH_CHAR,
+    DELETED_CHAR, DELETED_LABEL, EMPTY_CHAR, INTERACTIVE_ADD_HELP, LINE_SEPERATOR, MODIFIED_CHAR,
+    MODIFIED_LABEL, NOTHING_TO_COMMIT_MESSAGE, NO_FILES_SELECTED_TO_ADD, NO_REMOTE_INFO,
+    RUNNING_GIT_ADD, STAGED_LABEL, TICKED_BOX, UNSTAGED_LABEL, UNTRACKED_CHAR, UNTRACKED_LABEL,
+};
 
 pub enum DuckCommands {
     Status,
     Branch,
     Add,
+    FuzzyBranchSwitch,
 }
 
 impl DuckCommands {
     /// DUCKS!
     pub fn run(&self) {
         match self {
-            DuckCommands::Status => self.duck_file_status(),
-            DuckCommands::Branch => self.duck_branch(),
-            DuckCommands::Add => self.duck_interactive_add(),
+            Self::Status => self.duck_file_status(),
+            Self::Branch => self.duck_branch(),
+            Self::Add => self.duck_interactive_add(),
+            Self::FuzzyBranchSwitch => self.duck_fuzzy_branch_switch(),
         }
+    }
+
+    fn duck_fuzzy_branch_switch(&self) {
+        let out = match BaseCliCommands::FzfGitBranch.run(None) {
+            Ok(output) => output,
+            Err(e) => {
+                e.printout();
+                return;
+            }
+        };
+
+        if out.trim().is_empty() {
+            DuckErrors::NoBranchGiven.printout();
+            return;
+        }
+
+        let out = match BaseCliCommands::GitSwitch.run(Some(out.trim().to_string())) {
+            Ok(output) => output,
+            Err(e) => {
+                e.printout();
+                return;
+            }
+        };
+        println!("{}\n {}", color::Fg(color::Green), out.trim());
     }
 
     /// pretty git status for files output
@@ -222,7 +252,7 @@ impl DuckCommands {
 
         if to_be_added.is_empty() {
             println!("{}\n{}", color::Fg(color::Green), NO_FILES_SELECTED_TO_ADD);
-            return
+            return;
         }
 
         for file in to_be_added {

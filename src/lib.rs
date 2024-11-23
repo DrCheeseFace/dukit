@@ -12,7 +12,9 @@ const NO_FILES_SELECTED_TO_ADD: &str = "no files selected to add";
 
 const NOTHING_TO_COMMIT_MESSAGE: &str = "Nothing to commit, working tree clean.";
 const NO_REMOTE_INFO: &str = "No remote info.";
-
+const GIT_SWITCH_UNCOMMITED_CHANGES_ERROR: &str =
+    "error: Your local changes to the following files would be overwritten by checkout:";
+const SWITCHED_BRANCH: &str = "Switched to branch";
 const CURRENT_BRANCH_CHAR: char = '*';
 const COMMENT_CHAR: char = '#';
 const MODIFIED_CHAR: char = 'M';
@@ -34,7 +36,7 @@ impl std::fmt::Display for DisplayableCliCommand {
         let stdout = String::from_utf8_lossy(&self.0.stdout);
         let stderr = String::from_utf8_lossy(&self.0.stderr);
 
-        if stderr.is_empty() {
+        if stderr.is_empty() && !stderr.contains(SWITCHED_BRANCH){
             return writeln!(f, "{}", stdout);
         }
         writeln!(f, "{}", stderr)
