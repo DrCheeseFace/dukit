@@ -1,8 +1,5 @@
 use crate::{
-    base_commands::BaseCliCommands, errors::DuckErrors, COMMENT_CHAR, CURRENT_BRANCH_CHAR,
-    DELETED_CHAR, DELETED_LABEL, EMPTY_CHAR, INTERACTIVE_ADD_HELP, LINE_SEPERATOR, MODIFIED_CHAR,
-    MODIFIED_LABEL, NOTHING_TO_COMMIT_MESSAGE, NO_REMOTE_INFO, RUNNING_GIT_ADD, STAGED_LABEL,
-    TICKED_BOX, UNSTAGED_LABEL, UNTRACKED_CHAR, UNTRACKED_LABEL,
+    base_commands::BaseCliCommands, errors::DuckErrors, COMMENT_CHAR, CURRENT_BRANCH_CHAR, DELETED_CHAR, DELETED_LABEL, EMPTY_CHAR, INTERACTIVE_ADD_HELP, LINE_SEPERATOR, MODIFIED_CHAR, MODIFIED_LABEL, NOTHING_TO_COMMIT_MESSAGE, NO_FILES_SELECTED_TO_ADD, NO_REMOTE_INFO, RUNNING_GIT_ADD, STAGED_LABEL, TICKED_BOX, UNSTAGED_LABEL, UNTRACKED_CHAR, UNTRACKED_LABEL
 };
 use termion::color;
 
@@ -126,7 +123,7 @@ impl DuckCommands {
                 let branch = match branch.strip_prefix(CURRENT_BRANCH_CHAR) {
                     Some(output) => output.trim(),
                     None => {
-                        DuckErrors::TODO.printout();
+                        DuckErrors::Fuck.printout();
                         return;
                     }
                 };
@@ -203,7 +200,7 @@ impl DuckCommands {
         let line_seperator_index = match lines.iter().position(|&s| s.contains(LINE_SEPERATOR)) {
             Some(output) => output,
             None => {
-                DuckErrors::TODO.printout();
+                DuckErrors::NoMatchingLineSeperatorFound.printout();
                 return;
             }
         };
@@ -214,13 +211,18 @@ impl DuckCommands {
                 let line = match line.strip_prefix(TICKED_BOX) {
                     Some(output) => output,
                     None => {
-                        DuckErrors::TODO.printout();
+                        DuckErrors::Fuck.printout();
                         return;
                     }
                 };
 
                 to_be_added.push(line)
             }
+        }
+
+        if to_be_added.is_empty() {
+            println!("{}\n{}", color::Fg(color::Green), NO_FILES_SELECTED_TO_ADD);
+            return
         }
 
         for file in to_be_added {

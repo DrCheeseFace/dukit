@@ -43,22 +43,19 @@ impl BaseCliCommands {
     /// opens editor with given stdin to display to user
     /// returns a string of the saved file on exit
     fn open_editor(self, stdin: String) -> Result<String, DuckErrors> {
-        let mut file = File::create(TEMP_FILE_PATH).map_err(|_| DuckErrors::TODO)?;
+        let mut file = File::create(TEMP_FILE_PATH).map_err(|_| DuckErrors::CouldNotWriteToTempFile)?;
         file.write_all(stdin.as_bytes())
-            .map_err(|_| DuckErrors::TODO)?;
+            .map_err(|_| DuckErrors::CouldNotWriteToTempFile)?;
         drop(file);
 
         Command::new(self.get_editor())
             .arg(TEMP_FILE_PATH)
             .spawn()
-            .map_err(|_| DuckErrors::TODO)?
+            .map_err(|_| DuckErrors::SpawnChildProccesForEditor)?
             .wait()
-            .map_err(|_| DuckErrors::TODO)?;
+            .map_err(|_| DuckErrors::BadExitCodeForEditor)?;
 
-        if let Ok(out) = fs::read_to_string(TEMP_FILE_PATH) {
-            return Ok(out);
-        }
-        Err(DuckErrors::TODO)
+        Ok(fs::read_to_string(TEMP_FILE_PATH).map_err(|_| DuckErrors::CouldNotReadTempFile))?
     }
 
     /// runs git add {stdin}
@@ -68,11 +65,11 @@ impl BaseCliCommands {
             .arg("-c")
             .arg(cmd_to_add_file)
             .output()
-            .map_err(|_| DuckErrors::TODO)?;
+            .map_err(|_| DuckErrors::SpawnChildProccesForGeneric)?;
 
         let stderr = String::from_utf8_lossy(&output.stderr);
         if !stderr.is_empty() {
-            return Err(DuckErrors::TODO);
+            return Err(DuckErrors::GitAdd);
         }
 
         let displayable_output = DisplayableCliCommand(output);
@@ -86,12 +83,12 @@ impl BaseCliCommands {
             .arg("-c")
             .arg(self.get_cli_command())
             .output()
-            .map_err(|_| DuckErrors::TODO)?;
+            .map_err(|_| DuckErrors::SpawnChildProccesForGeneric)?;
 
         let stderr = String::from_utf8_lossy(&output.stderr);
 
         if !stderr.is_empty() {
-            return Err(DuckErrors::TODO);
+            return Err(DuckErrors::GitGeneric);
         }
 
         let displayable_output = DisplayableCliCommand(output);

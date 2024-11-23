@@ -77,6 +77,7 @@ cargo install dukit
 - [x] status info
 - [x] branch and remote info
 - [x] git add using editor
+- [x] unwrap unwrap unwrap unwrap unwrap unwrap 
 - [ ] git switch branch using editor
 - [ ] fuzzy branch switching?
 - [ ] ez stash and poppin info 
@@ -85,7 +86,6 @@ cargo install dukit
 - [ ] ez rebase
 - [ ] ez cherry pick 
 - [ ] random other git porcelein shizz 
-- [ ] unwrap unwrap unwrap unwrap unwrap unwrap 
 
 ![duck duck duck duck](duck.gif)
 

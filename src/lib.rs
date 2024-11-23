@@ -8,6 +8,7 @@ const TEMP_FILE_PATH: &str = "/tmp/duk.md";
 const LINE_SEPERATOR: &str = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
 const INTERACTIVE_ADD_HELP: &str = "# Selected files to be staged like so below V\n# [x] file.txt\n# Lines begining with (#) will be ignored";
 const RUNNING_GIT_ADD: &str = "running git add ";
+const NO_FILES_SELECTED_TO_ADD: &str = "no files selected to add";
 
 const NOTHING_TO_COMMIT_MESSAGE: &str = "Nothing to commit, working tree clean.";
 const NO_REMOTE_INFO: &str = "No remote info.";
