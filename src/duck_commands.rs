@@ -169,15 +169,15 @@ impl DuckCommands {
         for branch in &branches {
             if branch.chars().nth(0).unwrap() == CURRENT_BRANCH_CHAR {
                 let branch = match branch.strip_prefix(CURRENT_BRANCH_CHAR) {
-                    Some(output) => output.trim(),
+                    Some(output) => output,
                     None => {
                         DuckErrors::Fuck.printout();
                         return;
                     }
                 };
-                println!("{}{}", color::Fg(color::Green), branch);
+                println!("  {}{}", color::Fg(color::Green), branch.trim());
             } else {
-                println!("{}{}", color::Fg(color::Yellow), branch);
+                println!(" {}{}", color::Fg(color::Yellow), branch.trim());
             }
         }
     }
