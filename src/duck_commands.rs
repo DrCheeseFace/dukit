@@ -38,8 +38,8 @@ impl DuckCommands {
 
         for k in out.trim().split('\n').rev() {
             let (hash, message) = k.split_at(7);
-            println!("{}{}", color::Fg(color::LightYellow), hash);
-            println!("{}{}\n", color::Fg(color::Green), message);
+            println!("{}{}", color::Fg(color::Cyan), hash);
+            println!("{}{}", color::Fg(color::Green), message);
         }
     }
 
