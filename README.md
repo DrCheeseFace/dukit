@@ -74,6 +74,27 @@ This opens your default editor with files to add
 
 ```
 
+### Interactive `git add` via the keys 
+allows only upto 26 modified files at once, if more use `duckit -i`
+```
+Unstaged                     Staged
+
+                             a:  Cargo.lock
+s:  Cargo.toml
+d:  README.md
+                             f:  demo.gif
+g:  out.tape
+h:  src/duck_commands.rs
+
+> running git add  Cargo.lock
+ 
+   Cargo.lock Staged
+ 
+  running git add  demo.gif
+ 
+   demo.gif Staged
+```
+
 ### Better git log output 
 notice how the output is reversed (most recent at the bottom)
 ```

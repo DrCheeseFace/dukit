@@ -7,6 +7,7 @@ const TEMP_FILE_PATH: &str = "/tmp/duk.md";
 
 const LINE_SEPERATOR: &str = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
 const INTERACTIVE_ADD_HELP: &str = "# Selected files to be staged like so below V\n# [x] file.txt\n# Lines begining with (#) will be ignored";
+const KEY_ADD_HELP: &str = "esc to quit without staging, enter to stage selected files";
 const RUNNING_GIT_ADD: &str = "running git add ";
 const NO_FILES_SELECTED_TO_ADD: &str = "no files selected to add";
 
@@ -27,3 +28,7 @@ const MODIFIED_LABEL: &str = "Modified";
 const UNTRACKED_LABEL: &str = "Untracked";
 const DELETED_LABEL: &str = "Deleted";
 const TICKED_BOX: &str = "[x]";
+const CHAR_ARRAY: [char; 26] = [
+    'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
+    'z', 'x', 'c', 'v', 'b', 'n', 'm',
+];

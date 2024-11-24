@@ -14,6 +14,7 @@ pub enum DuckErrors {
     LocalChangesOverwrittenByCheckout,
     GitSwitchGeneric,
     NoBranchGiven,
+    TooManyFilesModifiedForKeyAdd,
 }
 
 impl std::fmt::Display for DuckErrors {
@@ -30,7 +31,8 @@ impl std::fmt::Display for DuckErrors {
             Self::CouldNotReadTempFile=> write!(f, "could not read temp file"),
             Self::LocalChangesOverwrittenByCheckout=> write!(f, "Your local changes would be overwritten. commit or stash your changes"),
             Self::GitSwitchGeneric=> write!(f, "could not run git switch"),
-            Self::NoBranchGiven=> write!(f, "no branch name given")
+            Self::NoBranchGiven=> write!(f, "no branch name given"),
+            Self::TooManyFilesModifiedForKeyAdd=> write!(f, "can only only this function when you have less than 27 files modified")
         }
     }
 }
