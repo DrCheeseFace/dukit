@@ -389,9 +389,7 @@ impl DuckCommands {
                         }
                     }
                 }
-                _ => {
-                    println!("{:?}", k)
-                }
+                _ => {}
             }
             stdout.flush().unwrap();
 
