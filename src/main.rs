@@ -25,6 +25,10 @@ struct Args {
     /// log info
     #[arg(short, long, default_value_t = false)]
     log: bool,
+
+    /// interactive add via keys (for when you have few files modified)
+    #[arg(short, long, default_value_t = false)]
+    key_add: bool,
 }
 
 fn main() {
@@ -35,6 +39,8 @@ fn main() {
         DuckCommands::Add.run();
     } else if args.fuzzybranch {
         DuckCommands::FuzzyBranchSwitch.run();
+    } else if args.key_add {
+        DuckCommands::KeyAdd.run();
     } else if args.log {
         DuckCommands::Log.run();
     } else if args.status {

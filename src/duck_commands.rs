@@ -1,4 +1,10 @@
-use termion::color;
+use std::io::{stdin, stdout};
+use std::io::{Stdout, Write};
+use termion::input::TermRead;
+
+use termion::raw::RawTerminal;
+use termion::screen::IntoAlternateScreen;
+use termion::{color, event::Key, raw::IntoRawMode};
 
 use crate::{
     base_commands::BaseCliCommands, errors::DuckErrors, COMMENT_CHAR, CURRENT_BRANCH_CHAR,
@@ -6,6 +12,14 @@ use crate::{
     MODIFIED_LABEL, NOTHING_TO_COMMIT_MESSAGE, NO_FILES_SELECTED_TO_ADD, NO_REMOTE_INFO,
     RUNNING_GIT_ADD, STAGED_LABEL, TICKED_BOX, UNSTAGED_LABEL, UNTRACKED_CHAR, UNTRACKED_LABEL,
 };
+use crate::{CHAR_ARRAY, KEY_ADD_HELP};
+
+#[derive(Debug)]
+struct GitFiles {
+    filename: String,
+    staged: bool,
+    key: char,
+}
 
 pub enum DuckCommands {
     Status,
@@ -13,6 +27,7 @@ pub enum DuckCommands {
     Add,
     FuzzyBranchSwitch,
     Log,
+    KeyAdd,
 }
 
 impl DuckCommands {
@@ -24,6 +39,7 @@ impl DuckCommands {
             Self::Add => self.duck_interactive_add(),
             Self::FuzzyBranchSwitch => self.duck_fuzzy_branch_switch(),
             Self::Log => self.duck_log(),
+            Self::KeyAdd => self.duck_key_add(),
         }
     }
 
@@ -288,6 +304,145 @@ impl DuckCommands {
                 }
             };
             println!("{}{} {}", color::Fg(color::Green), file, STAGED_LABEL);
+        }
+    }
+
+    fn duck_key_add(&self) {
+        let stdin = stdin();
+        let mut stdout = stdout().into_raw_mode().unwrap();
+        let mut files: Vec<GitFiles> = Vec::new();
+        let mut char_iter = CHAR_ARRAY.iter();
+
+        let out = match BaseCliCommands::Status.run(None) {
+            Ok(output) => output,
+            Err(e) => {
+                e.printout();
+                return;
+            }
+        };
+        let mut v: Vec<&str> = out.split('\n').collect();
+
+        // find a better way
+        v.pop();
+        v.pop();
+
+        for line in v {
+            let split: (&str, &str) = line.split_at(2);
+            let file = split.1;
+            let state = split.0;
+            let char = match char_iter.next() {
+                Some(output) => output,
+                None => {
+                    stdout.into_alternate_screen().unwrap();
+                    DuckErrors::TooManyFilesModifiedForKeyAdd.printout();
+                    return;
+                }
+            };
+
+            if state.chars().nth(0).unwrap() == EMPTY_CHAR
+                || state.chars().nth(0).unwrap() == UNTRACKED_CHAR
+                || state.chars().nth(1).unwrap() == MODIFIED_CHAR
+            {
+                files.push(GitFiles {
+                    filename: file.to_string(),
+                    staged: false,
+                    key: *char,
+                });
+            }
+        }
+
+        Self::print_staged_unstaged_files(self, &files, &mut stdout);
+
+        for k in stdin.keys() {
+            match k.as_ref().unwrap() {
+                Key::Esc => break,
+                Key::Char('\n') => {
+                    stdout.into_alternate_screen().unwrap();
+                    let staged: Vec<String> = files
+                        .iter()
+                        .filter(|f| f.staged)
+                        .map(|x| x.filename.clone())
+                        .collect();
+
+                    println!("{}{}", termion::clear::All, termion::cursor::Goto(1, 1));
+                    if staged.is_empty() {
+                        println!("{}\n{}", color::Fg(color::Green), NO_FILES_SELECTED_TO_ADD);
+                        return;
+                    }
+                    for file in staged {
+                        println!("{}{}{}\n", color::Fg(color::Yellow), RUNNING_GIT_ADD, file);
+                        match BaseCliCommands::AddFile.run(Some(file.to_string())) {
+                            Ok(output) => output,
+                            Err(e) => {
+                                e.printout();
+                                return;
+                            }
+                        };
+                        println!("{}{} {}\n", color::Fg(color::Green), file, STAGED_LABEL);
+                    }
+                    return;
+                }
+                Key::Char(c) => {
+                    for i in &mut files {
+                        if *c == i.key {
+                            i.staged = !i.staged
+                        }
+                    }
+                }
+                _ => {}
+            }
+            stdout.flush().unwrap();
+
+            Self::print_staged_unstaged_files(self, &files, &mut stdout);
+        }
+    }
+
+    fn print_staged_unstaged_files(&self, files: &[GitFiles], stdout: &mut RawTerminal<Stdout>) {
+        write!(
+            stdout,
+            "{}{}{}{}",
+            termion::clear::All,
+            termion::cursor::Goto(1, 1),
+            color::Fg(color::Yellow),
+            KEY_ADD_HELP
+        )
+        .unwrap();
+        write!(
+            stdout,
+            "{}{}{}{}{}",
+            color::Fg(color::Cyan),
+            termion::cursor::Goto(1, 3),
+            UNSTAGED_LABEL,
+            termion::cursor::Goto(30, 3),
+            STAGED_LABEL,
+        )
+        .unwrap();
+
+        for (i, file) in files.iter().enumerate() {
+            let mut line_y: u16 = i.try_into().unwrap(); //can unwrap here because of check for files.len in `duck_key_add(&self)`
+            line_y += 5;
+
+            if file.staged {
+                writeln!(
+                    stdout,
+                    "{}{}{}: {}",
+                    color::Fg(color::Green),
+                    termion::cursor::Goto(30, line_y),
+                    file.key,
+                    file.filename
+                )
+                .unwrap()
+            } else {
+                writeln!(
+                    stdout,
+                    "{}{}{}: {}",
+                    color::Fg(color::Red),
+                    termion::cursor::Goto(1, line_y),
+                    file.key,
+                    file.filename
+                )
+                .unwrap()
+            }
         }
     }
 }
