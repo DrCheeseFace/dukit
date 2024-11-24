@@ -92,8 +92,8 @@ apt install fzf
 - [x] git add using editor
 - [x] unwrap unwrap unwrap unwrap unwrap unwrap 
 - [x] fuzzy branch switching?
-- [ ] nice git log info
-- [ ] ez copy commit hashes 
+- [x] nice git log info
+- [x] ez copy commit hashes 
 - [ ] ez rebase
 - [ ] ez cherry pick 
 - [ ] random other git porcelein shizz 

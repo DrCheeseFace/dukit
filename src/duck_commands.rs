@@ -12,6 +12,7 @@ pub enum DuckCommands {
     Branch,
     Add,
     FuzzyBranchSwitch,
+    Log,
 }
 
 impl DuckCommands {
@@ -22,6 +23,23 @@ impl DuckCommands {
             Self::Branch => self.duck_branch(),
             Self::Add => self.duck_interactive_add(),
             Self::FuzzyBranchSwitch => self.duck_fuzzy_branch_switch(),
+            Self::Log => self.duck_log(),
+        }
+    }
+
+    fn duck_log(&self) {
+        let out = match BaseCliCommands::GitLog.run(None) {
+            Ok(output) => output,
+            Err(e) => {
+                e.printout();
+                return;
+            }
+        };
+
+        for k in out.trim().split('\n').rev() {
+            let (hash, message) = k.split_at(7);
+            println!("{}{}", color::Fg(color::LightYellow), hash);
+            println!("{}{}\n", color::Fg(color::Green), message);
         }
     }
 

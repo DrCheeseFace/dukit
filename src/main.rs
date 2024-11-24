@@ -21,6 +21,10 @@ struct Args {
     /// fuzzy switch branch 
     #[arg(short, long, default_value_t = false)]
     fuzzybranch: bool,
+
+    /// log info 
+    #[arg(short, long, default_value_t = false)]
+    log: bool,
 }
 
 fn main() {
@@ -31,6 +35,8 @@ fn main() {
         DuckCommands::Add.run();
     } else if args.fuzzybranch {
         DuckCommands::FuzzyBranchSwitch.run();
+    } else if args.log{
+        DuckCommands::Log.run();
     } else if args.status {
         DuckCommands::Status.run();
     }
