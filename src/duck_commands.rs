@@ -290,12 +290,7 @@ impl DuckCommands {
         }
 
         for file in to_be_added {
-            println!(
-                "{}\n {} {} ",
-                color::Fg(color::Yellow),
-                RUNNING_GIT_ADD,
-                file
-            );
+            println!("{}{}{}", color::Fg(color::Yellow), RUNNING_GIT_ADD, file);
             match BaseCliCommands::AddFile.run(Some(file.to_string())) {
                 Ok(output) => output,
                 Err(e) => {
@@ -303,7 +298,7 @@ impl DuckCommands {
                     return;
                 }
             };
-            println!("{}{} {}", color::Fg(color::Green), file, STAGED_LABEL);
+            println!("{}{} {}\n", color::Fg(color::Green), file, STAGED_LABEL);
         }
     }
 
@@ -370,7 +365,7 @@ impl DuckCommands {
                         return;
                     }
                     for file in staged {
-                        println!("{}{}{}\n", color::Fg(color::Yellow), RUNNING_GIT_ADD, file);
+                        println!("{}{}{}", color::Fg(color::Yellow), RUNNING_GIT_ADD, file);
                         match BaseCliCommands::AddFile.run(Some(file.to_string())) {
                             Ok(output) => output,
                             Err(e) => {
