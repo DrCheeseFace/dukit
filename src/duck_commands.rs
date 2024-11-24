@@ -305,47 +305,14 @@ impl DuckCommands {
     fn duck_key_add(&self) {
         let stdin = stdin();
         let mut stdout = stdout().into_raw_mode().unwrap();
-        let mut files: Vec<GitFiles> = Vec::new();
-        let mut char_iter = CHAR_ARRAY.iter();
 
-        let out = match BaseCliCommands::Status.run(None) {
+        let mut files = match Self::get_unstaged_files(self, &mut stdout) {
             Ok(output) => output,
             Err(e) => {
                 e.printout();
                 return;
             }
         };
-        let mut v: Vec<&str> = out.split('\n').collect();
-
-        // find a better way
-        v.pop();
-        v.pop();
-
-        for line in v {
-            let split: (&str, &str) = line.split_at(2);
-            let file = split.1;
-            let state = split.0;
-            let char = match char_iter.next() {
-                Some(output) => output,
-                None => {
-                    stdout.into_alternate_screen().unwrap();
-                    DuckErrors::TooManyFilesModifiedForKeyAdd.printout();
-                    return;
-                }
-            };
-
-            if state.chars().nth(0).unwrap() == EMPTY_CHAR
-                || state.chars().nth(0).unwrap() == UNTRACKED_CHAR
-                || state.chars().nth(1).unwrap() == MODIFIED_CHAR
-            {
-                files.push(GitFiles {
-                    filename: file.to_string(),
-                    staged: false,
-                    key: *char,
-                });
-            }
-        }
-
         Self::print_staged_unstaged_files(self, &files, &mut stdout);
 
         for k in stdin.keys() {
@@ -390,6 +357,45 @@ impl DuckCommands {
 
             Self::print_staged_unstaged_files(self, &files, &mut stdout);
         }
+    }
+
+    fn get_unstaged_files(
+        &self,
+        stdout: &mut RawTerminal<Stdout>,
+    ) -> Result<Vec<GitFiles>, DuckErrors> {
+        let mut files: Vec<GitFiles> = Vec::new();
+        let mut char_iter = CHAR_ARRAY.iter();
+        let out = BaseCliCommands::Status.run(None)?;
+        let mut v: Vec<&str> = out.split('\n').collect();
+
+        // find a better way
+        v.pop();
+        v.pop();
+
+        for line in v {
+            let split: (&str, &str) = line.split_at(2);
+            let file = split.1;
+            let state = split.0;
+            let char = match char_iter.next() {
+                Some(output) => output,
+                None => {
+                    stdout.into_alternate_screen().unwrap();
+                    return Err(DuckErrors::TooManyFilesModifiedForKeyAdd);
+                }
+            };
+
+            if state.chars().nth(0).unwrap() == EMPTY_CHAR
+                || state.chars().nth(0).unwrap() == UNTRACKED_CHAR
+                || state.chars().nth(1).unwrap() == MODIFIED_CHAR
+            {
+                files.push(GitFiles {
+                    filename: file.to_string(),
+                    staged: false,
+                    key: *char,
+                });
+            }
+        }
+        Ok(files)
     }
 
     fn print_staged_unstaged_files(&self, files: &[GitFiles], stdout: &mut RawTerminal<Stdout>) {
