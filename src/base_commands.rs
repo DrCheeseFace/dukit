@@ -15,6 +15,7 @@ pub enum BaseCliCommands {
     AddFile,
     FzfGitBranch,
     GitSwitch,
+    GitLog,
 }
 
 impl BaseCliCommands {
@@ -40,6 +41,7 @@ impl BaseCliCommands {
             Self::AddFile => "git add".to_string(),
             Self::FzfGitBranch => "git branch -l| grep '^[^*]' | fzf".to_string(),
             Self::GitSwitch => "git switch".to_string(),
+            Self::GitLog => "git log --oneline".to_string(),
         }
     }
 

@@ -73,6 +73,29 @@ This opens your default editor with files to add
   demo.gif staged
 
 ```
+
+### Better git log output 
+notice how the output is reversed (most recent at the bottom)
+```
+8436fdb
+ init 
+
+dc7338e
+ chore: commit 1 
+
+30357b2
+ feat: commit 2 
+
+0562d8c
+ feat: commit 3 
+
+5dade7e
+ refactor: commit 4 
+
+0167a1b
+ feat: commit 5 
+```
+
 ## Installation
 ```
 cargo install dukit
@@ -92,8 +115,8 @@ apt install fzf
 - [x] git add using editor
 - [x] unwrap unwrap unwrap unwrap unwrap unwrap 
 - [x] fuzzy branch switching?
-- [ ] nice git log info
-- [ ] ez copy commit hashes 
+- [x] nice git log info
+- [x] ez copy commit hashes 
 - [ ] ez rebase
 - [ ] ez cherry pick 
 - [ ] random other git porcelein shizz 
