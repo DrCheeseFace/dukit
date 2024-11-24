@@ -1,5 +1,6 @@
 use crate::errors::DuckErrors;
-use crate::{DisplayableCliCommand, GIT_SWITCH_UNCOMMITED_CHANGES_ERROR, TEMP_FILE_PATH};
+use crate::output::DisplayableCliCommand;
+use crate::{GIT_SWITCH_UNCOMMITED_CHANGES_ERROR, TEMP_FILE_PATH};
 use std::{
     env::var,
     fs::{self, File},

@@ -1,7 +1,7 @@
 pub mod base_commands;
 pub mod duck_commands;
 pub mod errors;
-use std::process::Output;
+mod output;
 
 const TEMP_FILE_PATH: &str = "/tmp/duk.md";
 
@@ -27,18 +27,3 @@ const MODIFIED_LABEL: &str = "Modified";
 const UNTRACKED_LABEL: &str = "Untracked";
 const DELETED_LABEL: &str = "Deleted";
 const TICKED_BOX: &str = "[x]";
-
-#[derive(Debug)]
-pub struct DisplayableCliCommand(Output);
-
-impl std::fmt::Display for DisplayableCliCommand {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let stdout = String::from_utf8_lossy(&self.0.stdout);
-        let stderr = String::from_utf8_lossy(&self.0.stderr);
-
-        if stderr.is_empty() && !stderr.contains(SWITCHED_BRANCH){
-            return writeln!(f, "{}", stdout);
-        }
-        writeln!(f, "{}", stderr)
-    }
-}
