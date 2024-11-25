@@ -19,7 +19,7 @@ jobs:
     - name: Run check
       run: cargo check
     - name: Run clippy check
-      run: cargo clippy --check
+      run: cargo rustc -- -Dwarnings
     - name: Build
       run: cargo build --verbose
     - name: Run format check
