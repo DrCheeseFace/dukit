@@ -3,6 +3,7 @@
 For the orange\yellow bill inclined amongst us
 - Tha goal is a git cli wrapper that does 95% of what you need to do but SUPER slick.
 - gota be able to yank text from the terminal with EASE
+- This is more a tool i want to use personally so dont expect things to work well for you aswell
 
 ![demo](demo.gif)
 
