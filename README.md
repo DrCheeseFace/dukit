@@ -97,18 +97,23 @@ h:  src/duck_commands.rs
 ### Better git log output 
 notice how the output is reversed (most recent at the bottom)
 ```
-8436fdb
- init 
-dc7338e
- chore: commit 1 
-30357b2
- feat: commit 2 
-0562d8c
- feat: commit 3 
-5dade7e
- refactor: commit 4 
-0167a1b
- feat: commit 5 
+c525447
+added MIT license
+
+f5f3531
+feat: git add via keys
+
+51ea5cb
+fix: removed debug printstatement
+
+a72b18b
+Merge pull request #2 from DrCheeseFace/feature/rework-gitadd-interactive
+
+d9e5d70
+chore: prettier printout for git add keys and interactive
+
+4c503ad
+refactor: more like refuctor
 ```
 
 ## Installation

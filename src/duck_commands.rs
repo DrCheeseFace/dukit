@@ -53,9 +53,9 @@ impl DuckCommands {
         };
 
         for k in out.trim().split('\n').rev() {
-            let (hash, message) = k.split_at(7);
-            println!("{}{}", color::Fg(color::Cyan), hash);
-            println!("{}{}", color::Fg(color::Green), message);
+            let (hash, message): (String, String) = k.split_once(' ').into_iter().collect();
+            println!("{}{}", color::Fg(color::Yellow), hash);
+            println!("{}{}\n", color::Fg(color::White), message);
         }
     }
 
